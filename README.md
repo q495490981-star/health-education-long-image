@@ -80,7 +80,44 @@ Codex 也可能根据任务自动选用匹配的技能；如果没有自动触�
 
 ## 使用条件与注意事项
 
-本技能是**工作流程说明**，不自带图像生成模型或图片拼接工具。是否能生成图片、读取附件及拼接长图，取决于使用环境提供的工具和权限。不同模型可能出现错字、漏字或改写，发布前应核对全文；医学内容应由具备相应专业能力的人审核。
+### 有图片生成能力的 Agent
+
+优先使用该 Agent 当前可用的图片生成工具，按技能中的风格生成；如有原文，应逐段检查是否有错字或漏字。用户提供的风格参考图可在任务中单独附上。
+
+### 没有图片生成能力的 Agent：本地素材与排版
+
+如果 Agent 能读取文件并运行本地程序，可以使用技能自带的素材和 Python 排版程序。此路径无需图片生成接口或 API 密钥；需要 Python 3、Pillow 与本机中文字体。生成的插画仅限现有素材，素材不足时不能凭空创造新的插画。
+
+首次使用需安装 Pillow（如已安装可跳过）：
+
+```bash
+python -m pip install Pillow
+```
+
+准备 UTF-8 编码的 JSON 文件，例如 `article.json`：
+
+```json
+{
+  "title": "文章原文标题",
+  "subtitle": "文章原文副标题",
+  "sections": [
+    {"heading": "原文小标题", "body": "这里放入完整的原文段落。", "illustration": "low-back"},
+    {"heading": "另一个小标题", "body": "这里放入下一段完整的原文。", "illustration": "rehab-walk"}
+  ]
+}
+```
+
+在仓库根目录运行：
+
+```bash
+python health-education-long-image/scripts/render_long_image.py --input article.json --output long-image.png
+```
+
+如提示找不到中文字体，在命令后追加 `--font /字体文件的路径`；也可设置环境变量 `HEALTH_IMAGE_FONT`。安装后的脚本位于技能目录的 `scripts/` 下。可用素材名称和对应内容见 `health-education-long-image/assets/illustrations/manifest.json`；没有适合段落的图片时可省略 `illustration` 字段。程序不会联网下载字体或素材。
+
+部分 Agent 不允许执行程序或读取本地文件，这些环境需要另行配置相应工具；单独的技能文件不能突破平台限制。极长文章可按原文顺序分批生成再拼接。
+
+不同模型可能出现错字、漏字或改写，发布前应核对全文；医学内容应由具备相应专业能力的人审核。插画为通用场景，不作为解剖图或动作教学依据。
 
 本公开项目使用文字描述参考风格，不包含原参考图。示例图片用于展示效果，非医疗建议。
 
@@ -88,6 +125,8 @@ Codex 也可能根据任务自动选用匹配的技能；如果没有自动触�
 
 - `health-education-long-image/SKILL.md`：技能触发条件和操作说明。
 - `health-education-long-image/agents/openai.yaml`：技能界面元数据。
+- `health-education-long-image/assets/illustrations/`：五张通用手绘素材与清单。
+- `health-education-long-image/scripts/render_long_image.py`：本地离线排版程序。
 - `examples/`：长图和分段效果示例。
 
 ## 许可证

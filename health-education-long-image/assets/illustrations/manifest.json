@@ -1,0 +1,27 @@
+{
+  "doctor-patient": {
+    "file": "doctor-patient.png",
+    "description": "医生与患者交流",
+    "purpose": "通用场景插画，不作为解剖图或动作教学依据"
+  },
+  "low-back": {
+    "file": "low-back.png",
+    "description": "腰部疼痛患者",
+    "purpose": "通用场景插画，不作为解剖图或动作教学依据"
+  },
+  "neck-shoulder": {
+    "file": "neck-shoulder.png",
+    "description": "颈肩不适患者",
+    "purpose": "通用场景插画，不作为解剖图或动作教学依据"
+  },
+  "knee": {
+    "file": "knee.png",
+    "description": "膝痛患者",
+    "purpose": "通用场景插画，不作为解剖图或动作教学依据"
+  },
+  "rehab-walk": {
+    "file": "rehab-walk.png",
+    "description": "康复师陪同步行",
+    "purpose": "通用场景插画，不作为解剖图或动作教学依据"
+  }
+}

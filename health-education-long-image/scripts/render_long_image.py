@@ -64,11 +64,15 @@ def main():
     parser.add_argument('--input', required=True, help='UTF-8 JSON input file')
     parser.add_argument('--output', required=True, help='Output PNG path')
     parser.add_argument('--font', help='Path to a Chinese TrueType or OpenType font')
+    parser.add_argument('--illustrations-dir', type=Path, help='Directory of topic-specific PNGs named by illustration key; defaults to bundled library')
     args = parser.parse_args()
     with open(args.input, encoding='utf-8') as f:
         data = json.load(f)
     if not isinstance(data, dict) or not isinstance(data.get('sections'), list):
         raise ValueError('Input must have a sections array')
+    illustration_dir = args.illustrations_dir if args.illustrations_dir is not None else ASSETS
+    if not illustration_dir.is_dir():
+        raise ValueError(f'Illustration directory not found: {illustration_dir}')
     fontfile = font_path(args.font)
     fonts = {k: ImageFont.truetype(fontfile, n) for k,n in [('title',64),('subtitle',37),('heading',48),('body',36)]}
     measure = ImageDraw.Draw(Image.new('RGB', (1,1)))
@@ -91,7 +95,7 @@ def main():
         if illustration:
             if not isinstance(illustration,str) or not illustration.replace('-','').isalnum():
                 raise ValueError('Illustration must be a simple asset key')
-            path=ASSETS/(illustration+'.png')
+            path=illustration_dir/(illustration+'.png')
             if not path.is_file(): raise ValueError(f'Unknown illustration {illustration!r}; use an existing asset or omit it')
             img=Image.open(path).convert('RGBA')
             img.thumbnail((480,340),Image.Resampling.LANCZOS)

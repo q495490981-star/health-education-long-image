@@ -105,11 +105,25 @@ def checked_text(value, name):
 
 
 def split_for_inline(text, font, fallback, width, draw, max_lines=4):
-    """Take at most the first four wrapped lines beside the image; keep all text."""
+    """Split at a wrapped-line boundary while keeping all input characters."""
     paragraph = text.split('\n', 1)[0]
     lines = wrap(paragraph, font, fallback, width, draw)
     end = sum(len(line) for line in lines[:max_lines])
     return text[:end], text[end:]
+
+
+def feather_image_edges(img, amount=0.06):
+    """Fade image edges only when explicitly requested; never modify source files."""
+    width, height = img.size
+    pad = max(1, int(min(width, height) * amount))
+    mask = Image.new('L', (width, height), 255)
+    md = ImageDraw.Draw(mask)
+    for i in range(pad):
+        value = round(255 * i / pad)
+        md.rectangle((i, i, width - 1 - i, height - 1 - i), outline=value)
+    from PIL import ImageChops
+    img.putalpha(ImageChops.multiply(img.getchannel('A'), mask))
+    return img
 
 
 def main():
@@ -172,6 +186,9 @@ def main():
         if layout not in accepted:
             raise ValueError(f'Unknown layout {layout!r}; use one of {sorted(accepted)}')
         illustration = section.get('illustration')
+        edge_mode = section.get('illustration_edge', 'keep')
+        if edge_mode not in ('keep', 'feather'):
+            raise ValueError("illustration_edge must be 'keep' or 'feather'")
         img = None
         if illustration:
             if not isinstance(illustration, str) or not illustration.replace('-','').isalnum():
@@ -181,6 +198,11 @@ def main():
                 raise ValueError(f'Unknown illustration {illustration!r}; use an existing asset or omit it')
             with Image.open(path) as loaded:
                 img = loaded.convert('RGBA')
+            alpha_min, alpha_max = img.getchannel('A').getextrema()
+            if alpha_min == 255 and edge_mode == 'keep':
+                print(f'Note: {path.name} has an opaque rectangular background; inspect for visible edges.', file=sys.stderr)
+            if edge_mode == 'feather':
+                img = feather_image_edges(img)
             # Trim only fully transparent padding, never opaque picture content.
             alpha_box = img.getchannel('A').getbbox()
             if alpha_box:
@@ -225,14 +247,19 @@ def main():
             text_x = x + image_width + gap if image_left else x
             image_x = x if image_left else x + text_width + gap
             if layout == 'image-inline':
-                first, rest = split_for_inline(body, fonts['body'], fallbacks['body'], text_width, measure)
+                side_lines = max(2, min(7, img.height // advances['body']))
+                first, rest = split_for_inline(body, fonts['body'], fallbacks['body'], text_width, measure, side_lines)
             else:
                 first, rest = body, ''
             text_end = add_text(first, 'body', DARK, text_x, y, text_width, section_ops) if first else y
             section_ops.append(('image', image_x + (image_width-img.width)//2, y, img))
             y = max(text_end, y + img.height)
             if rest:
-                y += 20
+                # The change from side-by-side to full width already creates
+                # a line break; consume exactly one leading newline if present.
+                if rest.startswith('\n'):
+                    rest = rest[1:]
+                y += 12
                 y = add_text(rest, 'body', DARK, x, y, usable, section_ops)
         else:
             if layout == 'image-top':

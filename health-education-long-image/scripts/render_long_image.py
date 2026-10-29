@@ -104,6 +104,14 @@ def checked_text(value, name):
     return value
 
 
+def split_for_inline(text, font, fallback, width, draw, max_lines=4):
+    """Take at most the first four wrapped lines beside the image; keep all text."""
+    paragraph = text.split('\n', 1)[0]
+    lines = wrap(paragraph, font, fallback, width, draw)
+    end = sum(len(line) for line in lines[:max_lines])
+    return text[:end], text[end:]
+
+
 def main():
     parser = argparse.ArgumentParser(description='Render user-supplied text and optional bundled illustrations without an image API.')
     parser.add_argument('--input', required=True, help='UTF-8 JSON input file')
@@ -183,8 +191,7 @@ def main():
             elif not img:
                 layout = 'text-only'
             elif len(body) > 110:
-                first = body.split('\n', 1)[0]
-                layout = ('image-inline' if index % 2 and len(first) <= 100 else 'image-middle') if '\n' in body else 'image-top'
+                layout = 'image-middle' if index % 3 == 2 and '\n' in body else 'image-inline'
             else:
                 layout = 'text-left' if index % 2 == 0 else 'text-right'
         if layout in ('text-left','text-right','image-inline','image-top','image-middle','image-bottom') and img is None:
@@ -217,11 +224,14 @@ def main():
             image_left = layout == 'text-right' or (layout == 'image-inline' and index % 2 == 1)
             text_x = x + image_width + gap if image_left else x
             image_x = x if image_left else x + text_width + gap
-            first, separator, rest = body.partition('\n') if layout == 'image-inline' else (body, '', '')
+            if layout == 'image-inline':
+                first, rest = split_for_inline(body, fonts['body'], fallbacks['body'], text_width, measure)
+            else:
+                first, rest = body, ''
             text_end = add_text(first, 'body', DARK, text_x, y, text_width, section_ops) if first else y
             section_ops.append(('image', image_x + (image_width-img.width)//2, y, img))
             y = max(text_end, y + img.height)
-            if separator:
+            if rest:
                 y += 20
                 y = add_text(rest, 'body', DARK, x, y, usable, section_ops)
         else:

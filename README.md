@@ -4,13 +4,19 @@
 
 ## 效果展示
 
-以下为腰痛科普示例，展示排版和插画风格。第一张是精简的早期版本，后两张是长图的分段示例；具体文字以使用者提供并审核过的文案为准。生成结果中的文字与医学内容仍需逐段核对。
+以下是同一篇腰痛科普文章的两张分段图片，以及由多个分段拼接后的完整长图。点击图片可查看原图。
 
-| 科普长图（早期精简版） | 阶梯治疗（分段） | 红旗信号（分段） |
-| :---: | :---: | :---: |
-| ![腰痛科普长图](examples/lumbar-overview.jpg) | ![腰痛阶梯治疗](examples/stepwise-care.jpg) | ![腰痛红旗信号](examples/red-flags.jpg) |
+### 分段图片
 
-点击图片可以查看大图。
+| 阶梯治疗 | 红旗信号 |
+| :---: | :---: |
+| [![阶梯治疗分段图](examples/stepwise-care.jpg)](examples/stepwise-care.jpg) | [![红旗信号分段图](examples/red-flags.jpg)](examples/red-flags.jpg) |
+
+### 拼接后的完整长图
+
+[![拼接后的完整腰痛科普长图](examples/lumbar-complete.jpg)](examples/lumbar-complete.jpg)
+
+示例展示排版和插画风格；图片中的文字与医学内容用于示例，实际宣教或发布前应结合原文及可靠资料核对。
 
 ## 特点
 

@@ -54,16 +54,20 @@
 
 安装的是同一份技能。**安装方式与两种生成方案是两回事**：安装后，如果 Agent 有图片生成功能，会优先使用该功能；没有时，符合本地运行条件才使用素材库排版。
 
-### 方法一：在 Codex 中让它帮忙安装
+### 方法一：让 Agent 帮你安装（无需 Git）
 
-在 Codex 对话中发送：
+在 Codex 或其他支持技能和文件操作的 Agent 对话中，直接发送：
 
 ```text
-请使用 $skill-installer，安装这个 GitHub 仓库里的技能：
-https://github.com/q495490981-star/health-education-long-image/tree/main/health-education-long-image
+请帮我安装医学科普长图技能，不要使用 skill-installer 或 Git。
+下载并解压这个 ZIP：
+https://github.com/q495490981-star/health-education-long-image/archive/refs/heads/main.zip
+找到其中包含 SKILL.md、scripts 和 assets 的 health-education-long-image 文件夹，完整复制到当前 Agent 的个人技能目录。
+请先检查当前操作系统和技能目录；如果目标位置已有同名技能，先询问我再覆盖。
+安装后检查 SKILL.md 和素材文件是否存在，并告诉我安装结果和使用方法。
 ```
 
-按照 Codex 的提示完成安装。如果当前环境没有 `$skill-installer`，可以使用下面的 ZIP 方法。
+Agent 需要有下载、解压和写入对应技能目录的权限；如果当前环境不能完成这些操作，请使用下面的手动方法。不同 Agent 和运行环境的技能目录可能不同，以该 Agent 的实际配置为准。
 
 ### 方法二：下载 ZIP 后手动安装（macOS / Linux，无需 Git）
 

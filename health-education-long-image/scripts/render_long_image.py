@@ -6,6 +6,7 @@ import os
 import sys
 import tempfile
 import atexit
+import random
 from pathlib import Path
 from functools import lru_cache
 
@@ -85,8 +86,12 @@ def wrap(text, font, fallback, width, draw):
         for ch in line:
             candidate = cur + ch
             if cur and line_width(candidate, font, fallback, draw) > width:
-                result.append(cur)
-                cur = ch
+                if ch in '，。！？；：、）》】」』' and len(cur) > 1:
+                    result.append(cur[:-1])
+                    cur = cur[-1] + ch
+                else:
+                    result.append(cur)
+                    cur = ch
             else:
                 cur = candidate
         result.append(cur)
@@ -158,7 +163,7 @@ def main():
                 layout = 'warning'
             elif not img:
                 layout = 'text-only'
-            elif len(body) > 180:
+            elif len(body) > 110:
                 layout = 'image-bottom'
             else:
                 layout = 'text-left' if index % 2 == 0 else 'text-right'
@@ -177,7 +182,7 @@ def main():
             y = add_text(heading, 'heading', ORANGE, x, y, usable, section_ops)
             y += 16
         if layout in ('text-left','text-right'):
-            gap, image_width = 28, 275
+            gap, image_width = 28, 350
             text_width = usable - image_width - gap
             img.thumbnail((image_width, 340), Image.Resampling.LANCZOS)
             text_x = x if layout == 'text-left' else x + image_width + gap
@@ -190,7 +195,7 @@ def main():
                 y = add_text(body, 'body', DARK, x, y, usable, section_ops)
             if img is not None:
                 y += 20
-                img.thumbnail((480,340), Image.Resampling.LANCZOS)
+                img.thumbnail((600,420), Image.Resampling.LANCZOS)
                 section_ops.append(('image', (WIDTH-img.width)//2, y, img))
                 y += img.height
         if is_warning:
@@ -203,14 +208,39 @@ def main():
         raise SystemExit('Document is too long for one image. Split into ordered input files without dropping text.')
     canvas = Image.new('RGB', (WIDTH, total), BG)
     draw = ImageDraw.Draw(canvas)
+
+    def brush(left, top, width, height, seed):
+        # Pale, irregular strokes remain behind the text and never change it.
+        rng = random.Random(seed)
+        right = min(WIDTH - MARGIN // 2, left + width)
+        for row in range(4):
+            yy = top + 13 + row * max(5, (height - 22) // 4)
+            inset = rng.randint(0, 18)
+            draw.line([(left + inset, yy), (right - rng.randint(0, 20), yy + rng.randint(-3, 3))],
+                      fill=('#f8e6ce' if row % 2 else '#f9ead7'), width=16)
+
+    def sprig(x, top):
+        draw.line([(x, top + 42), (x + 18, top + 10)], fill='#a5ae83', width=3)
+        draw.ellipse((x-4, top+21, x+9, top+32), fill='#b9c29a')
+        draw.ellipse((x+9, top+6, x+22, top+18), fill='#b9c29a')
+        draw.ellipse((x+25, top+23, x+33, top+31), fill='#e5b788')
+
     for op in ops:
         if op[0] == 'box':
             _, left, top, right, bottom = op
             draw.rounded_rectangle((left, top, right, bottom), radius=24, fill='#fbe9df', outline='#e6b8a4', width=2)
         elif op[0] == 'line':
             _, x, top, style, color, line = op
+            if line and style in ('title', 'heading'):
+                width = int(line_width(line, fonts[style], fallbacks[style], measure))
+                brush(max(0, x - 10), top + 3, min(width + 30, WIDTH - x - 20),
+                      advances[style] - 4, top)
+                if x + width + 65 < WIDTH - MARGIN:
+                    sprig(int(x + width + 28), top + 6)
             for run, font in split_runs(line, fonts[style], fallbacks[style]):
-                draw.text((x,top), run, font=font, fill=color)
+                draw.text((x,top), run, font=font, fill=color,
+                          stroke_width=1 if style in ('title', 'heading') else 0,
+                          stroke_fill=color)
                 x += draw.textlength(run, font=font)
         else:
             _, x, top, img = op

@@ -139,7 +139,7 @@ def main():
         y += 10
         y = add_text(checked_text(data['subtitle'], 'subtitle'), 'subtitle', DARK, MARGIN, y, WIDTH-2*MARGIN, ops)
     y += 56
-    accepted = {'auto','text-left','text-right','image-bottom','text-only','warning'}
+    accepted = {'auto','text-left','text-right','image-top','image-middle','image-bottom','text-only','warning'}
     for index, section in enumerate(data['sections']):
         if not isinstance(section, dict):
             raise ValueError('Each section must be an object')
@@ -158,16 +158,20 @@ def main():
                 raise ValueError(f'Unknown illustration {illustration!r}; use an existing asset or omit it')
             with Image.open(path) as loaded:
                 img = loaded.convert('RGBA')
+            # Trim only fully transparent padding, never opaque picture content.
+            alpha_box = img.getchannel('A').getbbox()
+            if alpha_box:
+                img = img.crop(alpha_box)
         if layout == 'auto':
             if any(term in heading for term in ('红旗','警示','紧急')):
                 layout = 'warning'
             elif not img:
                 layout = 'text-only'
             elif len(body) > 110:
-                layout = 'image-bottom'
+                layout = 'image-middle' if '\n' in body else 'image-top'
             else:
                 layout = 'text-left' if index % 2 == 0 else 'text-right'
-        if layout in ('text-left','text-right') and img is None:
+        if layout in ('text-left','text-right','image-top','image-middle','image-bottom') and img is None:
             raise ValueError(f'Layout {layout!r} requires an illustration')
         if layout == 'text-only' and img is not None:
             raise ValueError("text-only cannot be used with an illustration; choose image-bottom or remove it")
@@ -181,23 +185,43 @@ def main():
         if heading:
             y = add_text(heading, 'heading', ORANGE, x, y, usable, section_ops)
             y += 16
+        def add_image(max_width, max_height):
+            nonlocal y, img
+            scale = min(max_width / img.width, max_height / img.height, 2.0)
+            size = (max(1, round(img.width * scale)), max(1, round(img.height * scale)))
+            sized = img.resize(size, Image.Resampling.LANCZOS)
+            section_ops.append(('image', (WIDTH-sized.width)//2, y, sized))
+            y += sized.height + 24
+
         if layout in ('text-left','text-right'):
-            gap, image_width = 28, 350
+            gap, image_width = 28, min(400, int(usable * 0.44))
             text_width = usable - image_width - gap
-            img.thumbnail((image_width, 340), Image.Resampling.LANCZOS)
+            scale = min(image_width/img.width, 440/img.height, 2.0)
+            img = img.resize((max(1,round(img.width*scale)),max(1,round(img.height*scale))),Image.Resampling.LANCZOS)
             text_x = x if layout == 'text-left' else x + image_width + gap
             image_x = x + text_width + gap if layout == 'text-left' else x
             text_end = add_text(body, 'body', DARK, text_x, y, text_width, section_ops) if body else y
             section_ops.append(('image', image_x + (image_width-img.width)//2, y, img))
             y = max(text_end, y + img.height)
         else:
-            if body:
-                y = add_text(body, 'body', DARK, x, y, usable, section_ops)
-            if img is not None:
-                y += 20
-                img.thumbnail((600,420), Image.Resampling.LANCZOS)
-                section_ops.append(('image', (WIDTH-img.width)//2, y, img))
-                y += img.height
+            if layout == 'image-top':
+                add_image(min(usable, 760), 600)
+            if layout == 'image-middle' and body:
+                cut = body.find('\n')
+                if cut < 0:
+                    add_image(min(usable, 760), 600)
+                    y = add_text(body, 'body', DARK, x, y, usable, section_ops)
+                else:
+                    y = add_text(body[:cut], 'body', DARK, x, y, usable, section_ops)
+                    y += 12
+                    add_image(min(usable, 760), 600)
+                    y = add_text(body[cut+1:], 'body', DARK, x, y, usable, section_ops)
+            else:
+                if body:
+                    y = add_text(body, 'body', DARK, x, y, usable, section_ops)
+                if img is not None and layout not in ('image-top',):
+                    y += 20
+                    add_image(min(usable, 760), 600)
         if is_warning:
             y += 28
             ops.append(('box', MARGIN-12, start, WIDTH-MARGIN+12, y))

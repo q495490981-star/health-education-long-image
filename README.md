@@ -64,11 +64,7 @@ npx skills add q495490981-star/health-education-long-image -g
 
 根据提示选择要安装的技能和 Agent。需要 Node.js（包含 npx）和网络连接；此命令会临时运行开源的 skills 命令行工具，不需要在 Agent 中安装插件。访问 GitHub 仓库时，可能需要系统安装 Git；不想使用 Git 或没有 Node.js，可直接使用下面的 ZIP 方法。部分 Agent 未被工具识别时，也可用 ZIP 手动安装。
 
-也可以在支持下载和文件操作的 Agent 对话中直接说：
-
-> 请帮我安装这个技能：https://github.com/q495490981-star/health-education-long-image
-
-请 Agent 确认实际安装位置；如果它无法联网或写入技能目录，使用下面的 ZIP 方法。桌面应用、云端会话与本地 Agent 不一定共享技能目录。
+也可以把上面的命令发给有终端操作能力的 Agent，让它代为执行。桌面应用、云端会话与本地 Agent 不一定共享技能目录，请确认安装到了需要使用的环境。
 
 ### 方法二：下载 ZIP 后手动安装（macOS / Linux，无需 Git）
 

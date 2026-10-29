@@ -146,7 +146,7 @@ python health-education-long-image/scripts/render_long_image.py --input article.
 
 使用 `--illustrations-dir` 时只从指定目录读取插画，不自动混入素材库；需要混用时先把所需素材复制到该目录。要遵守所用 Agent 关于图片编辑和文件操作的要求。
 
-每个 `sections` 段落还可设置 `layout`：`auto`（默认自动选择）、`text-left`（文字在左）、`text-right`（文字在右）、`image-top`（插画在正文前）、`image-middle`（插画在首段后）、`image-bottom`（插画在正文后）、`text-only`（纯文字）、`warning`（警示框）。图文布局需要提供对应的独立 `illustration`；长段落可用较大插画放在正文前或段落之间，插画的可见大小也取决于原图留白。自动选择依靠插画、字数和标题关键词，不判断医学事实，生成后须检查图文是否匹配。
+每个 `sections` 段落还可设置 `layout`：`auto`（默认自动选择）、`text-left`（文字在左）、`text-right`（文字在右）、`image-inline`（首段图文并排、后续文字占整行）、`image-top`（插画在正文前）、`image-middle`（插画在首段后）、`image-bottom`（插画在正文后）、`text-only`（纯文字）、`warning`（警示框）。图文布局需要提供对应的独立 `illustration`；长段落可用较大插画放在正文前或段落之间，插画的可见大小也取决于原图留白。自动选择依靠插画、字数和标题关键词，不判断医学事实，生成后须检查图文是否匹配。
 
 技能自带精简中文字体与拉丁文字回退字体（仓库中中文字体分块保存，程序会在运行时自动组合），若提示缺少某个字或符号，请在命令后添加 `--font 字体文件的路径` 指定覆盖该字符的完整字体，也可设置 `HEALTH_IMAGE_FONT`。可用素材名称及对应场景见 `health-education-long-image/assets/illustrations/manifest.json`；不需要插画时可以省略 `illustration` 字段。程序不会联网下载字体或素材。已经使用真实中文文章验证基本渲染和缺字提示；不同系统、字体与内容仍需检查输出。遇到特别长的文章，需要按原文顺序分批制作并另行拼接。
 

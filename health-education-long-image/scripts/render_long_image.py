@@ -109,6 +109,7 @@ def main():
     parser.add_argument('--input', required=True, help='UTF-8 JSON input file')
     parser.add_argument('--output', required=True, help='Output PNG path')
     parser.add_argument('--font', help='Path to a Chinese TrueType or OpenType font')
+    parser.add_argument('--title-font', help='Optional Chinese font for title and headings; body keeps --font or the default')
     parser.add_argument('--illustrations-dir', type=Path, help='Directory of topic-specific PNGs named by illustration key; defaults to bundled library')
     args = parser.parse_args()
     with open(args.input, encoding='utf-8') as f:
@@ -123,6 +124,12 @@ def main():
     fallback_path = ROOT / 'assets' / 'fonts' / 'DejaVuSans.ttf'
     fallbacks = {k: ImageFont.truetype(str(fallback_path), n) if fallback_path.is_file() else None
                  for k,n in [('title',64),('subtitle',37),('heading',48),('body',36)]}
+    if args.title_font:
+        if not Path(args.title_font).is_file():
+            raise ValueError(f'Title font not found: {args.title_font}')
+        for style, size in [('title',64), ('heading',48)]:
+            fallbacks[style] = fonts[style]
+            fonts[style] = ImageFont.truetype(args.title_font, size)
     measure = ImageDraw.Draw(Image.new('RGB', (1,1)))
     ops = []
     y = 100

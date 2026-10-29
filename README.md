@@ -6,13 +6,13 @@
 
 ## 两种生成方案
 
-技能会根据当前 Agent 可用的能力选择路径；用户的明确要求优先。
+技能会根据当前 Agent 可用的能力选择路径；用户的明确要求优先。**有可用生图工具时应优先生成贴合主题的插画；文字准确性不是改用固定素材库的理由。**
 
 | | Agent 自带图片生成 | 本地素材与排版 |
 | --- | --- | --- |
 | **适用情况** | Agent 已有可用的图片生成或编辑功能 | Agent 没有图片生成功能，但能读取文件、运行本地程序 |
 | **插画来源** | 使用 Agent 的图片工具生成，可以按主题创作新的插画 | 使用仓库自带的插画素材；暂无对应素材时可留白或提示补充 |
-| **文字处理** | 分段生成并逐段检查，注意模型可能出现错字、漏字或改写 | 使用本地程序将提供的文字排入图片，仍需检查输入和最终效果 |
+| **文字处理** | 在环境允许时可先生成无文字插画，再用本地程序写入原文；也可使用生图与编辑工具并逐段核对 | 使用本地程序将提供的文字排入图片，仍需检查输入和最终效果 |
 | **所需条件** | 图片生成工具、对应账户权限及可用额度 | Python 3、Pillow、中文字体和本地文件/程序执行权限；生成过程无需图片生成 API 或密钥 |
 | **当前限制** | 可用性、效果和费用取决于 Agent 与其工具 | 素材仍较少，无法自行画出素材库中没有的新场景；实际中文字体显示尚待验证 |
 
@@ -108,9 +108,9 @@ https://github.com/q495490981-star/health-education-long-image/tree/main/health-
 
 Codex 可以使用 `/skills` 查看，或在提示中输入 `$health-education-long-image`。其他 Agent 的调用方式以其技能列表和当前版本为准。若没有自动调用，请明确要求使用该技能。
 
-### 离线排版程序
+### 排版程序：原创插画或本地素材
 
-如果 Agent 没有图片生成能力、但能执行程序，可以使用本地素材排版。需要 Python 3、Pillow 和中文字体；如已安装 Pillow，无需重复安装。
+有生图能力时，可先生成无文字插画，再在环境允许的情况下用本程序排入文字；没有图片生成能力、但能执行程序时，可以使用本地素材排版。需要 Python 3、Pillow 和中文字体；如已安装 Pillow，无需重复安装。
 
 ```bash
 python -m pip install Pillow
@@ -134,6 +134,14 @@ python -m pip install Pillow
 ```bash
 python health-education-long-image/scripts/render_long_image.py --input article.json --output long-image.png
 ```
+
+如使用 Agent 新生成的 PNG 插画，可先把它们放在单独的目录中，例如 `generated-illustrations/winter-care.png`，在相应段落的 JSON 中填写 `"illustration": "winter-care"`，并运行：
+
+```bash
+python health-education-long-image/scripts/render_long_image.py --input article.json --output long-image.png --illustrations-dir generated-illustrations
+```
+
+使用 `--illustrations-dir` 时只从指定目录读取插画，不自动混入素材库；需要混用时先把所需素材复制到该目录。要遵守所用 Agent 关于图片编辑和文件操作的要求。
 
 如提示找不到中文字体，可在命令后添加 `--font 字体文件的路径`，或设置 `HEALTH_IMAGE_FONT`。可用素材名称及对应场景见 `health-education-long-image/assets/illustrations/manifest.json`；不需要插画时可以省略 `illustration` 字段。程序不会联网下载字体或素材。遇到特别长的文章，需要按原文顺序分批制作并另行拼接。
 

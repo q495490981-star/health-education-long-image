@@ -119,49 +119,102 @@ def main():
     fallbacks = {k: ImageFont.truetype(str(fallback_path), n) if fallback_path.is_file() else None
                  for k,n in [('title',64),('subtitle',37),('heading',48),('body',36)]}
     measure = ImageDraw.Draw(Image.new('RGB', (1,1)))
-    blocks=[]
-    def add_text(text, style, color):
-        for line in wrap(text, fonts[style], fallbacks[style], WIDTH-2*MARGIN, measure):
-            blocks.append(('line', line, style, color, {'title':86,'subtitle':62,'heading':72,'body':58}[style]))
-    def space(n): blocks.append(('space',n))
-    add_text(checked_text(data.get('title',''), 'title'), 'title', ORANGE)
+    ops = []
+    y = 100
+    advances = {'title': 86, 'subtitle': 62, 'heading': 72, 'body': 58}
+
+    def add_text(text, style, color, x, top, available_width, target):
+        for line in wrap(text, fonts[style], fallbacks[style], available_width, measure):
+            target.append(('line', x, top, style, color, line))
+            top += advances[style]
+        return top
+
+    y = add_text(checked_text(data.get('title',''), 'title'), 'title', ORANGE, MARGIN, y, WIDTH-2*MARGIN, ops)
     if data.get('subtitle'):
-        space(10); add_text(checked_text(data['subtitle'],'subtitle'), 'subtitle', DARK)
-    space(56)
+        y += 10
+        y = add_text(checked_text(data['subtitle'], 'subtitle'), 'subtitle', DARK, MARGIN, y, WIDTH-2*MARGIN, ops)
+    y += 56
+    accepted = {'auto','text-left','text-right','image-bottom','text-only','warning'}
     for index, section in enumerate(data['sections']):
-        if not isinstance(section,dict): raise ValueError('Each section must be an object')
-        heading=checked_text(section.get('heading',''),f'sections[{index}].heading')
-        body=checked_text(section.get('body',''),f'sections[{index}].body')
-        if heading: add_text(heading,'heading',ORANGE); space(20)
-        if body: add_text(body,'body',DARK); space(20)
-        illustration=section.get('illustration')
+        if not isinstance(section, dict):
+            raise ValueError('Each section must be an object')
+        heading = checked_text(section.get('heading',''), f'sections[{index}].heading')
+        body = checked_text(section.get('body',''), f'sections[{index}].body')
+        layout = section.get('layout', 'auto')
+        if layout not in accepted:
+            raise ValueError(f'Unknown layout {layout!r}; use one of {sorted(accepted)}')
+        illustration = section.get('illustration')
+        img = None
         if illustration:
-            if not isinstance(illustration,str) or not illustration.replace('-','').isalnum():
+            if not isinstance(illustration, str) or not illustration.replace('-','').isalnum():
                 raise ValueError('Illustration must be a simple asset key')
-            path=illustration_dir/(illustration+'.png')
-            if not path.is_file(): raise ValueError(f'Unknown illustration {illustration!r}; use an existing asset or omit it')
-            img=Image.open(path).convert('RGBA')
-            img.thumbnail((480,340),Image.Resampling.LANCZOS)
-            blocks.append(('image',img,img.height+25))
-        space(58)
-    total = 100 + sum(b[-1] if b[0] in ('line','image') else b[1] for b in blocks) + 50
-    if total > 50000: raise SystemExit('Document is too long for one image. Split into ordered input files without dropping text.')
-    canvas=Image.new('RGB',(WIDTH,total),BG)
-    draw=ImageDraw.Draw(canvas)
-    y=100
-    for b in blocks:
-        if b[0]=='space': y+=b[1]
-        elif b[0]=='line':
-            _,line,style,color,advance=b
-            x = MARGIN
-            for run, font in split_runs(line, fonts[style], fallbacks[style]):
-                draw.text((x,y),run,font=font,fill=color,stroke_width=0)
-                x += draw.textlength(run, font=font)
-            y+=advance
+            path = illustration_dir / (illustration + '.png')
+            if not path.is_file():
+                raise ValueError(f'Unknown illustration {illustration!r}; use an existing asset or omit it')
+            with Image.open(path) as loaded:
+                img = loaded.convert('RGBA')
+        if layout == 'auto':
+            if any(term in heading for term in ('红旗','警示','紧急')):
+                layout = 'warning'
+            elif not img:
+                layout = 'text-only'
+            elif len(body) > 180:
+                layout = 'image-bottom'
+            else:
+                layout = 'text-left' if index % 2 == 0 else 'text-right'
+        if layout in ('text-left','text-right') and img is None:
+            raise ValueError(f'Layout {layout!r} requires an illustration')
+        if layout == 'text-only' and img is not None:
+            raise ValueError("text-only cannot be used with an illustration; choose image-bottom or remove it")
+
+        section_ops = []
+        is_warning = layout == 'warning'
+        start = y
+        x = MARGIN + (28 if is_warning else 0)
+        usable = WIDTH - 2 * x
+        if is_warning: y += 28
+        if heading:
+            y = add_text(heading, 'heading', ORANGE, x, y, usable, section_ops)
+            y += 16
+        if layout in ('text-left','text-right'):
+            gap, image_width = 28, 275
+            text_width = usable - image_width - gap
+            img.thumbnail((image_width, 340), Image.Resampling.LANCZOS)
+            text_x = x if layout == 'text-left' else x + image_width + gap
+            image_x = x + text_width + gap if layout == 'text-left' else x
+            text_end = add_text(body, 'body', DARK, text_x, y, text_width, section_ops) if body else y
+            section_ops.append(('image', image_x + (image_width-img.width)//2, y, img))
+            y = max(text_end, y + img.height)
         else:
-            _,img,advance=b
-            canvas.paste(img,((WIDTH-img.width)//2,y),img)
-            y+=advance
+            if body:
+                y = add_text(body, 'body', DARK, x, y, usable, section_ops)
+            if img is not None:
+                y += 20
+                img.thumbnail((480,340), Image.Resampling.LANCZOS)
+                section_ops.append(('image', (WIDTH-img.width)//2, y, img))
+                y += img.height
+        if is_warning:
+            y += 28
+            ops.append(('box', MARGIN-12, start, WIDTH-MARGIN+12, y))
+        ops.extend(section_ops)
+        y += 58
+    total = y + 50
+    if total > 50000:
+        raise SystemExit('Document is too long for one image. Split into ordered input files without dropping text.')
+    canvas = Image.new('RGB', (WIDTH, total), BG)
+    draw = ImageDraw.Draw(canvas)
+    for op in ops:
+        if op[0] == 'box':
+            _, left, top, right, bottom = op
+            draw.rounded_rectangle((left, top, right, bottom), radius=24, fill='#fbe9df', outline='#e6b8a4', width=2)
+        elif op[0] == 'line':
+            _, x, top, style, color, line = op
+            for run, font in split_runs(line, fonts[style], fallbacks[style]):
+                draw.text((x,top), run, font=font, fill=color)
+                x += draw.textlength(run, font=font)
+        else:
+            _, x, top, img = op
+            canvas.paste(img, (x,top), img)
     output=Path(args.output); output.parent.mkdir(parents=True,exist_ok=True)
     canvas.save(output,format='PNG')
     print(f'Saved {output} ({WIDTH} x {total})')

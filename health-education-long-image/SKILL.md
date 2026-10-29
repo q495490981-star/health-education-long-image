@@ -27,13 +27,13 @@ description: 制作中文科普长图、医学健康宣教长图片或将用户�
 
 ### 本地排版工具
 
-- `scripts/render_long_image.py` 用 Python 3、Pillow 与本机中文字体生成 PNG，不依赖图片 API。输入 UTF-8 JSON，按原文顺序完整填入：
+- `scripts/render_long_image.py` 用 Python 3、Pillow 与技能自带中文字体生成 PNG，不依赖图片 API；支持时用户亦可指定完整字体。输入 UTF-8 JSON，按原文顺序完整填入：
 
 ```json
 {"title":"原文标题","subtitle":"原文副标题","sections":[{"heading":"原文小标题","body":"原文段落","illustration":"low-back"},{"heading":"另一小标题","body":"原文段落"}]}
 ```
 
-- 使用默认素材运行：`python scripts/render_long_image.py --input 文章.json --output 长图.png`。素材键及含义见 `assets/illustrations/manifest.json`；无合适素材时省略 illustration。若找不到中文字体，传入 `--font 字体路径` 或设置 `HEALTH_IMAGE_FONT`。
+- 使用默认素材运行：`python scripts/render_long_image.py --input 文章.json --output 长图.png`。素材键及含义见 `assets/illustrations/manifest.json`；无合适素材时省略 illustration。自带字体是精简字集；若程序提示缺字，使用覆盖这些字符的中文字体，传入 `--font 字体路径` 或设置 `HEALTH_IMAGE_FONT`，再重新检查完整输出，不要替换或删除原文。
 - 组合原创插画和程序排字时，允许的情况下先将生图工具生成的无文字 PNG 放在临时目录，按段命名如 `winter-care.png`，在对应段落设 `"illustration":"winter-care"`，再运行 `python scripts/render_long_image.py --input 文章.json --output 长图.png --illustrations-dir 临时目录`。该选项读取指定目录，不会同时使用默认素材；需混用时先在临时目录准备所需图片。不得绕过宿主对图像编辑工具的要求。
 - 长文可分组渲染并在允许的环境下按顺序拼接，核对整篇内容。程序仅作排版，不会进行医学事实核查。最终图片必须真实产出。
 - 若既无图片生成也无运行程序能力，如实说明限制，不假装生成了图片。

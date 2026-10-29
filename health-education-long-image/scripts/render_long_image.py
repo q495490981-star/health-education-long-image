@@ -4,7 +4,10 @@ import argparse
 import json
 import os
 import sys
+import tempfile
+import atexit
 from pathlib import Path
+from functools import lru_cache
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -23,7 +26,19 @@ GREEN = '#e7edd3'
 
 def font_path(explicit):
     home = Path.home()
+    if explicit and not Path(explicit).is_file():
+        raise SystemExit(f'Chinese font file not found: {explicit}')
+    bundled = ROOT / 'assets' / 'fonts' / 'NotoSansSC-Standard-Light.ttf'
+    if not bundled.is_file():
+        parts = sorted((ROOT / 'assets' / 'fonts').glob('NotoSansSC-Standard-Light.ttf.part[0-9][0-9][0-9]'))
+        if len(parts) == 6:
+            with tempfile.NamedTemporaryFile(suffix='.ttf', delete=False) as tmp:
+                for part in parts:
+                    tmp.write(part.read_bytes())
+                bundled = Path(tmp.name)
+            atexit.register(lambda: bundled.unlink(missing_ok=True))
     choices = [explicit, os.getenv('HEALTH_IMAGE_FONT'),
+        str(bundled),
         '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',
         '/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc',
         '/System/Library/Fonts/PingFang.ttc',
@@ -37,14 +52,39 @@ def font_path(explicit):
     raise SystemExit('A Chinese font is required. Pass --font PATH or set HEALTH_IMAGE_FONT to a Chinese font file.')
 
 
-def wrap(text, font, width, draw):
+@lru_cache(maxsize=16384)
+def glyph_font(char, primary, fallback):
+    if char.isspace():
+        return primary
+    for font in (primary, fallback):
+        if font is not None and bytes(font.getmask(char)) != bytes(font.getmask('\U0010ffff')):
+            return font
+    raise ValueError(f'Font does not support character {char!r} (U+{ord(char):04X}); pass --font with a font containing it.')
+
+
+def split_runs(text, primary, fallback):
+    runs = []
+    for char in text:
+        font = glyph_font(char, primary, fallback)
+        if runs and runs[-1][1] is font:
+            runs[-1] = (runs[-1][0] + char, font)
+        else:
+            runs.append((char, font))
+    return runs
+
+
+def line_width(text, primary, fallback, draw):
+    return sum(draw.textlength(run, font=font) for run, font in split_runs(text, primary, fallback))
+
+
+def wrap(text, font, fallback, width, draw):
     # Line-wrap only: characters and punctuation are neither rewritten nor removed.
     result = []
     for line in text.split('\n'):
         cur = ''
         for ch in line:
             candidate = cur + ch
-            if cur and draw.textlength(candidate, font=font) > width:
+            if cur and line_width(candidate, font, fallback, draw) > width:
                 result.append(cur)
                 cur = ch
             else:
@@ -75,10 +115,13 @@ def main():
         raise ValueError(f'Illustration directory not found: {illustration_dir}')
     fontfile = font_path(args.font)
     fonts = {k: ImageFont.truetype(fontfile, n) for k,n in [('title',64),('subtitle',37),('heading',48),('body',36)]}
+    fallback_path = ROOT / 'assets' / 'fonts' / 'DejaVuSans.ttf'
+    fallbacks = {k: ImageFont.truetype(str(fallback_path), n) if fallback_path.is_file() else None
+                 for k,n in [('title',64),('subtitle',37),('heading',48),('body',36)]}
     measure = ImageDraw.Draw(Image.new('RGB', (1,1)))
     blocks=[]
     def add_text(text, style, color):
-        for line in wrap(text, fonts[style], WIDTH-2*MARGIN, measure):
+        for line in wrap(text, fonts[style], fallbacks[style], WIDTH-2*MARGIN, measure):
             blocks.append(('line', line, style, color, {'title':86,'subtitle':62,'heading':72,'body':58}[style]))
     def space(n): blocks.append(('space',n))
     add_text(checked_text(data.get('title',''), 'title'), 'title', ORANGE)
@@ -110,7 +153,10 @@ def main():
         if b[0]=='space': y+=b[1]
         elif b[0]=='line':
             _,line,style,color,advance=b
-            draw.text((MARGIN,y),line,font=fonts[style],fill=color,stroke_width=0)
+            x = MARGIN
+            for run, font in split_runs(line, fonts[style], fallbacks[style]):
+                draw.text((x,y),run,font=font,fill=color,stroke_width=0)
+                x += draw.textlength(run, font=font)
             y+=advance
         else:
             _,img,advance=b

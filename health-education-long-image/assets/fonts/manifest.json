@@ -1,0 +1,15 @@
+{
+  "NotoSansSC-Standard-Light.ttf": {
+    "source": "https://github.com/w3labkr/font-noto/tree/main/subset/NotoSansSC/standard",
+    "source_file": "NotoSansSC-Light.woff2",
+    "changes": "WOFF2 to TTF (fontTools), standard subset",
+    "license_file": "OFL-Noto.txt",
+    "license": "SIL Open Font License 1.1",
+    "distribution": "分成 6 个 part 文件，程序运行时自动组合"
+  },
+  "DejaVuSans.ttf": {
+    "source": "https://dejavu-fonts.github.io/",
+    "license_file": "DejaVu-LICENSE.txt",
+    "license": "DejaVu fonts license"
+  }
+}

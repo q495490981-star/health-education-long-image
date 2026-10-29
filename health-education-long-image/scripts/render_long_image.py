@@ -134,12 +134,20 @@ def main():
             top += advances[style]
         return top
 
-    y = add_text(checked_text(data.get('title',''), 'title'), 'title', ORANGE, MARGIN, y, WIDTH-2*MARGIN, ops)
+    title_start = len(ops)
+    y = add_text(checked_text(data.get('title',''), 'title'), 'title', DARK, MARGIN, y, WIDTH-2*MARGIN, ops)
+    for pos in range(title_start, len(ops)):
+        kind, _, top, style, color, line = ops[pos]
+        ops[pos] = (kind, int((WIDTH-line_width(line, fonts[style], fallbacks[style], measure))/2), top, style, color, line)
     if data.get('subtitle'):
         y += 10
+        subtitle_start = len(ops)
         y = add_text(checked_text(data['subtitle'], 'subtitle'), 'subtitle', DARK, MARGIN, y, WIDTH-2*MARGIN, ops)
+        for pos in range(subtitle_start, len(ops)):
+            kind, _, top, style, color, line = ops[pos]
+            ops[pos] = (kind, int((WIDTH-line_width(line, fonts[style], fallbacks[style], measure))/2), top, style, color, line)
     y += 56
-    accepted = {'auto','text-left','text-right','image-top','image-middle','image-bottom','text-only','warning'}
+    accepted = {'auto','text-left','text-right','image-inline','image-top','image-middle','image-bottom','text-only','warning'}
     for index, section in enumerate(data['sections']):
         if not isinstance(section, dict):
             raise ValueError('Each section must be an object')
@@ -168,10 +176,11 @@ def main():
             elif not img:
                 layout = 'text-only'
             elif len(body) > 110:
-                layout = 'image-middle' if '\n' in body else 'image-top'
+                first = body.split('\n', 1)[0]
+                layout = ('image-inline' if index % 2 and len(first) <= 100 else 'image-middle') if '\n' in body else 'image-top'
             else:
                 layout = 'text-left' if index % 2 == 0 else 'text-right'
-        if layout in ('text-left','text-right','image-top','image-middle','image-bottom') and img is None:
+        if layout in ('text-left','text-right','image-inline','image-top','image-middle','image-bottom') and img is None:
             raise ValueError(f'Layout {layout!r} requires an illustration')
         if layout == 'text-only' and img is not None:
             raise ValueError("text-only cannot be used with an illustration; choose image-bottom or remove it")
@@ -193,16 +202,21 @@ def main():
             section_ops.append(('image', (WIDTH-sized.width)//2, y, sized))
             y += sized.height + 24
 
-        if layout in ('text-left','text-right'):
+        if layout in ('text-left','text-right','image-inline'):
             gap, image_width = 28, min(400, int(usable * 0.44))
             text_width = usable - image_width - gap
             scale = min(image_width/img.width, 440/img.height, 2.0)
             img = img.resize((max(1,round(img.width*scale)),max(1,round(img.height*scale))),Image.Resampling.LANCZOS)
-            text_x = x if layout == 'text-left' else x + image_width + gap
-            image_x = x + text_width + gap if layout == 'text-left' else x
-            text_end = add_text(body, 'body', DARK, text_x, y, text_width, section_ops) if body else y
+            image_left = layout == 'text-right' or (layout == 'image-inline' and index % 2 == 1)
+            text_x = x + image_width + gap if image_left else x
+            image_x = x if image_left else x + text_width + gap
+            first, separator, rest = body.partition('\n') if layout == 'image-inline' else (body, '', '')
+            text_end = add_text(first, 'body', DARK, text_x, y, text_width, section_ops) if first else y
             section_ops.append(('image', image_x + (image_width-img.width)//2, y, img))
             y = max(text_end, y + img.height)
+            if separator:
+                y += 20
+                y = add_text(rest, 'body', DARK, x, y, usable, section_ops)
         else:
             if layout == 'image-top':
                 add_image(min(usable, 760), 600)

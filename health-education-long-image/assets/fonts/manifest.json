@@ -4,12 +4,21 @@
     "source_file": "NotoSansSC-Light.woff2",
     "changes": "WOFF2 to TTF (fontTools), standard subset",
     "license_file": "OFL-Noto.txt",
-    "license": "SIL Open Font License 1.1",
-    "distribution": "分成 6 个 part 文件，程序运行时自动组合"
+    "license": "SIL Open Font License 1.1"
   },
   "DejaVuSans.ttf": {
     "source": "https://dejavu-fonts.github.io/",
     "license_file": "DejaVu-LICENSE.txt",
     "license": "DejaVu fonts license"
+  },
+  "LXGWWenKai-Regular.ttf": {
+    "license_file": "OFL-LXGW.txt",
+    "license": "SIL Open Font License 1.1",
+    "storage": "gzip 分块，运行时组合解压"
+  },
+  "LXGWZhenKaiSlabGB-Regular.ttf": {
+    "license_file": "OFL-ZhenKai.txt",
+    "license": "SIL Open Font License 1.1",
+    "storage": "gzip 分块，运行时组合解压"
   }
 }

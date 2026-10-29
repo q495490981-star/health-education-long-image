@@ -1,4 +1,4 @@
-# 医学科普长图 Skill v1.2
+# 医学科普长图 Skill v1.5
 
 把中文医学文章或宣教文案制作成适合手机阅读的手绘风格长图。默认保留用户原文，不加署名、不显示图号，内容较长时可分段制作后拼接。支持左右图文交错、上下图文和正文段落间插画，按内容选择合适布局。
 
@@ -15,8 +15,8 @@
 | **适用情况** | Agent 已有可用的图片生成或编辑功能 | Agent 没有图片生成功能，但能读取文件、运行本地程序 |
 | **插画来源** | 使用 Agent 的图片工具生成，可以按主题创作新的插画 | 使用仓库自带的插画素材；暂无对应素材时可留白或提示补充 |
 | **文字处理** | 在环境允许时可先生成无文字插画，再用本地程序写入原文；也可使用生图与编辑工具并逐段核对 | 使用本地程序将提供的文字排入图片，仍需检查输入和最终效果 |
-| **所需条件** | 图片生成工具、对应账户权限及可用额度 | Python 3、Pillow 和本地文件/程序执行权限；自带中文字体，生成过程无需图片生成 API 或密钥 |
-| **当前限制** | 可用性、效果和费用取决于 Agent 与其工具；生成的中文需逐字核对 | 素材仍较少，无法自行画出素材库中没有的新场景；精简字体不覆盖所有字符；离线排版程序提供固定水彩笔刷和植物点缀，效果与 AI 生成的整幅画面不同 |
+| **所需条件** | 图片生成工具、对应账户权限及可用额度 | Python 3、Pillow 和本地文件/程序执行权限；自带霞鹜文楷和霞鹜臻楷等字体，生成过程无需图片生成 API 或密钥 |
+| **当前限制** | 可用性、效果和费用取决于 Agent 与其工具；生成的中文需逐字核对 | 素材仍较少，无法自行画出素材库中没有的新场景；自带字体不覆盖所有字符；离线排版程序提供固定水彩笔刷和植物点缀，效果与 AI 生成的整幅画面不同 |
 
 **有生图能力时**，Agent 优先使用自己的图片工具，参考样张生成贴合主题的二维卡通手绘水彩插画或统一的水彩画面与装饰，避免生成照片式或三维写实画面。也可以先生成留有文字区域的无字画面，再在环境允许时排入原文。无论采用哪种方式，都要检查插画大小、图文关系，并逐段核对文字。
 
@@ -150,17 +150,20 @@ python health-education-long-image/scripts/render_long_image.py --input article.
 
 使用 `--illustrations-dir` 时只从指定目录读取插画，不自动混入素材库；需要混用时先把所需素材复制到该目录。要遵守所用 Agent 关于图片编辑和文件操作的要求。
 
-每个 `sections` 段落还可设置 `layout`：`auto`（默认自动选择）、`text-left`（文字在左）、`text-right`（文字在右）、`image-inline`（开头数行与插画并排、后续文字占整行）、`image-top`（插画在正文前）、`image-middle`（插画在首段后）、`image-bottom`（插画在正文后）、`text-only`（纯文字）、`warning`（警示框）。图文布局需要提供对应的独立 `illustration`；长段落可用较大插画放在正文前或段落之间，插画的可见大小也取决于原图留白。自动选择依靠插画、字数和标题关键词，不判断医学事实，生成后须检查图文是否匹配。 对带不透明矩形背景的插画，程序会提示检查；可在对应段落设置 `"illustration_edge":"feather"` 柔化边缘。该选项不移除背景，可能淡化边缘细节，使用后请核对人物和医学动作。
+每个 `sections` 段落还可设置 `layout`：`auto`（默认自动选择）、`text-left`（文字在左）、`text-right`（文字在右）、`image-inline`（完整短段与插画并排，其余文字通栏；首段过长时改为通栏）、`image-top`（插画在正文前）、`image-middle`（插画在首段后）、`image-bottom`（插画在正文后）、`text-only`（纯文字）、`warning`（提醒底纹）。图文布局需要提供对应的独立 `illustration`；长段落可用较大插画放在正文前或段落之间，插画的可见大小也取决于原图留白。自动选择依靠插画、字数和标题关键词，不判断医学事实，生成后须检查图文是否匹配。对带不透明矩形背景的插画，程序会提示检查；可在对应段落设置 `"illustration_edge":"feather"` 柔化边缘。该选项不移除背景，可能淡化边缘细节，使用后请核对人物和医学动作。
 
-技能自带精简中文字体与拉丁文字回退字体（仓库中中文字体分块保存，程序会在运行时自动组合），若提示缺少某个字或符号，请在命令后添加 `--font 字体文件的路径` 指定覆盖该字符的完整字体，也可设置 `HEALTH_IMAGE_FONT`。可用素材名称及对应场景见 `health-education-long-image/assets/illustrations/manifest.json`；不需要插画时可以省略 `illustration` 字段。程序不会联网下载字体或素材。已经使用真实中文文章验证基本渲染和缺字提示；不同系统、字体与内容仍需检查输出。遇到特别长的文章，需要按原文顺序分批制作并另行拼接。
+正文默认使用霞鹜文楷 Regular，标题默认使用霞鹜臻楷 Slab GB，另有思源黑体与拉丁文字回退字体。中文字体在仓库中分块保存，程序运行时自动组合，霞鹜字体还会自动解压，若提示缺少某个字或符号，请在命令后添加 `--font 字体文件的路径` 指定覆盖该字符的完整字体，也可设置 `HEALTH_IMAGE_FONT`。可用素材名称及对应场景见 `health-education-long-image/assets/illustrations/manifest.json`；不需要插画时可以省略 `illustration` 字段。程序不会联网下载字体或素材。已经使用真实中文文章验证基本渲染和缺字提示；不同系统、字体与内容仍需检查输出。遇到特别长的文章，需要按原文顺序分批制作并另行拼接。
 
-标题和小标题可使用本机已有的中文手写字体：在上述程序命令后添加 `--title-font 字体文件的路径`。正文仍使用默认字体或 `--font` 指定字体；手写字体不随技能提供，请自行确认字体授权和字符覆盖。
+标题和小标题默认使用随技能提供的霞鹜臻楷 Slab GB；可通过 `--title-font 字体文件的路径` 换用其他字体。正文仍使用默认的霞鹜文楷或 `--font` 指定字体。自选字体请确认授权与字符覆盖。离线字体与生图生成的毛笔字效果可能不同。
 
 ## 文件结构
 
 - `health-education-long-image/SKILL.md`：技能说明和两种工作流程。
 - `health-education-long-image/scripts/render_long_image.py`：本地排版程序。
-- `health-education-long-image/assets/approved-style.jpg`：用户认可的视觉风格样张。
+- `health-education-long-image/assets/approved-style.jpg`：标题水彩与装饰参考。
+- `health-education-long-image/assets/seasonal-reference.jpg`：纸张、手绘笔触及图文风格参考。
+- `health-education-long-image/assets/longform-reference.jpg`：长文分段和插画节奏参考。
+- `health-education-long-image/assets/typography-reference.png`：文字和图文搭配参考。
 - `health-education-long-image/assets/decor/`：离线水彩笔触与植物装饰素材。
 - `health-education-long-image/assets/illustrations/`：插画素材和清单，持续更新中。
 - `health-education-long-image/assets/fonts/`：离线字体与对应的授权文件。
@@ -168,7 +171,7 @@ python health-education-long-image/scripts/render_long_image.py --input article.
 
 ## 许可证
 
-程序与说明使用 MIT，详见 [LICENSE](LICENSE)；附带字体分别依其字体授权文件使用，不适用项目 MIT 许可。本公开项目包含经用户认可的生成样张，作为视觉风格参考，不包含最初的参考图。
+程序与说明使用 MIT，详见 [LICENSE](LICENSE)；附带字体分别依其字体授权文件使用，不适用项目 MIT 许可。本公开项目包含用于视觉风格参考的样张。
 
 ## 意见与建议
 

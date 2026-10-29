@@ -16,7 +16,7 @@
 | **插画来源** | 使用 Agent 的图片工具生成，可以按主题创作新的插画 | 使用仓库自带的插画素材；暂无对应素材时可留白或提示补充 |
 | **文字处理** | 在环境允许时可先生成无文字插画，再用本地程序写入原文；也可使用生图与编辑工具并逐段核对 | 使用本地程序将提供的文字排入图片，仍需检查输入和最终效果 |
 | **所需条件** | 图片生成工具、对应账户权限及可用额度 | Python 3、Pillow 和本地文件/程序执行权限；自带中文字体，生成过程无需图片生成 API 或密钥 |
-| **当前限制** | 可用性、效果和费用取决于 Agent 与其工具；生成的中文需逐字核对 | 素材仍较少，无法自行画出素材库中没有的新场景；精简字体不覆盖所有字符；离线排版程序提供简化笔刷和植物点缀，效果与 AI 生成的水彩画面不同 |
+| **当前限制** | 可用性、效果和费用取决于 Agent 与其工具；生成的中文需逐字核对 | 素材仍较少，无法自行画出素材库中没有的新场景；精简字体不覆盖所有字符；离线排版程序提供固定水彩笔刷和植物点缀，效果与 AI 生成的整幅画面不同 |
 
 两种方式都需在发布前核对原文、医学内容、解剖和动作。素材是通用场景插画，不作为精确解剖图或动作教学依据。
 
@@ -155,6 +155,7 @@ python health-education-long-image/scripts/render_long_image.py --input article.
 - `health-education-long-image/SKILL.md`：技能说明和两种工作流程。
 - `health-education-long-image/scripts/render_long_image.py`：本地排版程序。
 - `health-education-long-image/assets/approved-style.jpg`：用户认可的视觉风格样张。
+- `health-education-long-image/assets/decor/`：离线水彩笔触与植物装饰素材。
 - `health-education-long-image/assets/illustrations/`：插画素材和清单，持续更新中。
 - `health-education-long-image/assets/fonts/`：离线字体与对应的授权文件。
 - `examples/`：图片生成模式的分段与长图示例。

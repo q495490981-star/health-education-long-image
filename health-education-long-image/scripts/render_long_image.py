@@ -253,11 +253,31 @@ def main():
         raise SystemExit('Document is too long for one image. Split into ordered input files without dropping text.')
     canvas = Image.new('RGB', (WIDTH, total), BG)
     draw = ImageDraw.Draw(canvas)
+    brush_file = ROOT / 'assets' / 'decor' / 'watercolor-brush.png'
+    brush_art = None
+    if brush_file.is_file():
+        with Image.open(brush_file) as loaded:
+            brush_art = loaded.convert('RGBA')
+        bbox = brush_art.getchannel('A').getbbox()
+        if bbox:
+            brush_art = brush_art.crop(bbox)
+    sprig_file = ROOT / 'assets' / 'decor' / 'watercolor-sprig.png'
+    sprig_art = None
+    if sprig_file.is_file():
+        with Image.open(sprig_file) as loaded:
+            sprig_art = loaded.convert('RGBA')
+        bbox = sprig_art.getchannel('A').getbbox()
+        if bbox:
+            sprig_art = sprig_art.crop(bbox)
 
     def brush(left, top, width, height, seed):
-        # Pale, irregular strokes remain behind the text and never change it.
+        # Artwork stays behind the text; a procedural fallback preserves offline use.
         rng = random.Random(seed)
         right = min(WIDTH - MARGIN // 2, left + width)
+        if brush_art is not None and right > left:
+            stroke = brush_art.resize((right-left, height), Image.Resampling.LANCZOS)
+            canvas.paste(stroke, (left, top), stroke)
+            return
         for row in range(4):
             yy = top + 13 + row * max(5, (height - 22) // 4)
             inset = rng.randint(0, 18)
@@ -265,6 +285,11 @@ def main():
                       fill=('#f8e6ce' if row % 2 else '#f9ead7'), width=16)
 
     def sprig(x, top):
+        if sprig_art is not None:
+            leaf = sprig_art.copy()
+            leaf.thumbnail((45, 45), Image.Resampling.LANCZOS)
+            canvas.paste(leaf, (x, top + 2), leaf)
+            return
         draw.line([(x, top + 42), (x + 18, top + 10)], fill='#a5ae83', width=3)
         draw.ellipse((x-4, top+21, x+9, top+32), fill='#b9c29a')
         draw.ellipse((x+9, top+6, x+22, top+18), fill='#b9c29a')

@@ -150,7 +150,7 @@ python health-education-long-image/scripts/render_long_image.py --input article.
 
 技能自带精简中文字体与拉丁文字回退字体（仓库中中文字体分块保存，程序会在运行时自动组合），若提示缺少某个字或符号，请在命令后添加 `--font 字体文件的路径` 指定覆盖该字符的完整字体，也可设置 `HEALTH_IMAGE_FONT`。可用素材名称及对应场景见 `health-education-long-image/assets/illustrations/manifest.json`；不需要插画时可以省略 `illustration` 字段。程序不会联网下载字体或素材。已经使用真实中文文章验证基本渲染和缺字提示；不同系统、字体与内容仍需检查输出。遇到特别长的文章，需要按原文顺序分批制作并另行拼接。
 
-## 文件结构
+标题和小标题可使用本机已有的中文手写字体：在上述程序命令后添加 `--title-font 字体文件的路径`。正文仍使用默认字体或 `--font` 指定字体；手写字体不随技能提供，请自行确认字体授权和字符覆盖。\n\n## 文件结构
 
 - `health-education-long-image/SKILL.md`：技能说明和两种工作流程。
 - `health-education-long-image/scripts/render_long_image.py`：本地排版程序。

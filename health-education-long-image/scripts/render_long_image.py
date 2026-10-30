@@ -172,34 +172,39 @@ def main():
     parser.add_argument('--input', required=True, help='UTF-8 JSON input file')
     parser.add_argument('--output', required=True, help='Output PNG path')
     parser.add_argument('--font', help='Path to a Chinese TrueType or OpenType font')
-    parser.add_argument('--title-font', help='Optional Chinese font for title and headings; body keeps --font or the default')
+    parser.add_argument('--title-font', help='Optional Chinese font for the main title; headings and body keep --font or the default')
     parser.add_argument('--illustrations-dir', type=Path, help='Directory of topic-specific PNGs named by illustration key; defaults to bundled library')
     args = parser.parse_args()
     with open(args.input, encoding='utf-8') as f:
         data = json.load(f)
     if not isinstance(data, dict) or not isinstance(data.get('sections'), list):
         raise ValueError('Input must have a sections array')
+    title_style = data.get('title_style', 'brush')
+    if title_style not in ('brush', 'ink', 'soft'):
+        raise ValueError("title_style must be 'brush', 'ink', or 'soft'")
     illustration_dir = args.illustrations_dir if args.illustrations_dir is not None else ASSETS
     if not illustration_dir.is_dir():
         raise ValueError(f'Illustration directory not found: {illustration_dir}')
     fontfile = font_path(args.font)
-    fonts = {k: ImageFont.truetype(fontfile, n) for k,n in [('title',78),('subtitle',37),('heading',50),('body',44)]}
+    fonts = {k: ImageFont.truetype(fontfile, n) for k,n in [('title',96),('subtitle',37),('heading',50),('body',44)]}
     fallback_path = ROOT / 'assets' / 'fonts' / 'DejaVuSans.ttf'
     fallbacks = {k: ImageFont.truetype(str(fallback_path), n) if fallback_path.is_file() else None
-                 for k,n in [('title',78),('subtitle',37),('heading',50),('body',44)]}
+                 for k,n in [('title',96),('subtitle',37),('heading',50),('body',44)]}
     bundled_title = Path(bundled_font('LXGWZhenKaiSlabGB-Regular.ttf'))
-    if not args.title_font and bundled_title.is_file():
+    if not args.title_font and title_style != 'soft' and bundled_title.is_file():
         args.title_font = str(bundled_title)
     if args.title_font:
         if not Path(args.title_font).is_file():
             raise ValueError(f'Title font not found: {args.title_font}')
-        for style, size in [('title',78), ('heading',50)]:
+        # The chapter headings retain the lighter body typeface. Using the
+        # display face for both levels makes them look like repeated titles.
+        for style, size in [('title',96)]:
             fallbacks[style] = fonts[style]
             fonts[style] = ImageFont.truetype(args.title_font, size)
     measure = ImageDraw.Draw(Image.new('RGB', (1,1)))
     ops = []
     y = 100
-    advances = {'title': 104, 'subtitle': 62, 'heading': 76, 'body': 70}
+    advances = {'title': 126, 'subtitle': 62, 'heading': 76, 'body': 70}
 
     def add_text(text, style, color, x, top, available_width, target):
         paragraphs = text.split('\n')
@@ -212,7 +217,9 @@ def main():
         return top
 
     title_start = len(ops)
-    y = add_text(checked_text(data.get('title',''), 'title'), 'title', DARK, MARGIN, y, WIDTH-2*MARGIN, ops)
+    title_text = checked_text(data.get('title',''), 'title')
+    if title_text:
+        y = add_text(title_text, 'title', DARK, MARGIN, y, WIDTH-2*MARGIN, ops)
     for pos in range(title_start, len(ops)):
         kind, _, top, style, color, line = ops[pos]
         ops[pos] = (kind, int((WIDTH-line_width(line, fonts[style], fallbacks[style], measure))/2), top, style, color, line)
@@ -223,7 +230,8 @@ def main():
         for pos in range(subtitle_start, len(ops)):
             kind, _, top, style, color, line = ops[pos]
             ops[pos] = (kind, int((WIDTH-line_width(line, fonts[style], fallbacks[style], measure))/2), top, style, color, line)
-    y += 56
+    if title_text or data.get('subtitle'):
+        y += 56
     accepted = {'auto','text-left','text-right','image-inline','image-top','image-middle','image-bottom','text-only','warning'}
     for index, section in enumerate(data['sections']):
         if not isinstance(section, dict):
@@ -373,15 +381,6 @@ def main():
         bbox = brush_art.getchannel('A').getbbox()
         if bbox:
             brush_art = brush_art.crop(bbox)
-    sprig_file = ROOT / 'assets' / 'decor' / 'watercolor-sprig.png'
-    sprig_art = None
-    if sprig_file.is_file():
-        with Image.open(sprig_file) as loaded:
-            sprig_art = loaded.convert('RGBA')
-        bbox = sprig_art.getchannel('A').getbbox()
-        if bbox:
-            sprig_art = sprig_art.crop(bbox)
-
     def brush(left, top, width, height, seed):
         # Artwork stays behind the text; a procedural fallback preserves offline use.
         rng = random.Random(seed)
@@ -395,17 +394,6 @@ def main():
             inset = rng.randint(0, 18)
             draw.line([(left + inset, yy), (right - rng.randint(0, 20), yy + rng.randint(-3, 3))],
                       fill=('#f8e6ce' if row % 2 else '#f9ead7'), width=16)
-
-    def sprig(x, top):
-        if sprig_art is not None:
-            leaf = sprig_art.copy()
-            leaf.thumbnail((45, 45), Image.Resampling.LANCZOS)
-            canvas.paste(leaf, (x, top + 2), leaf)
-            return
-        draw.line([(x, top + 42), (x + 18, top + 10)], fill='#a5ae83', width=3)
-        draw.ellipse((x-4, top+21, x+9, top+32), fill='#b9c29a')
-        draw.ellipse((x+9, top+6, x+22, top+18), fill='#b9c29a')
-        draw.ellipse((x+25, top+23, x+33, top+31), fill='#e5b788')
 
     def wash(left, top, right, bottom, color, seed):
         # Broad irregular translucent pigment; no rectangular border.
@@ -428,6 +416,7 @@ def main():
         layer = layer.filter(ImageFilter.GaussianBlur(4))
         canvas.paste(layer, (0, 0), layer)
 
+    last_title_top = max((op[2] for op in ops if op[0] == 'line' and op[3] == 'title' and op[5]), default=None)
     for op in ops:
         if op[0] == 'box':
             _, left, top, right, bottom = op
@@ -436,10 +425,20 @@ def main():
             _, x, top, style, color, line = op
             if line and style in ('title', 'heading'):
                 width = int(line_width(line, fonts[style], fallbacks[style], measure))
-                brush(max(0, x - 10), top + 3, min(width + 30, WIDTH - x - 20),
-                      advances[style] - 4, top)
-                if x + width + 65 < WIDTH - MARGIN:
-                    sprig(int(x + width + 28), top + 6)
+                # A broad title wash and a lighter, narrower chapter stroke
+                # preserve distinct visual weights without covering glyphs.
+                height = advances[style] - 4 if style == 'title' else 57
+                offset = 3 if style == 'title' else 9
+                if style == 'title' and title_style == 'ink':
+                    # Draw once, beneath the final line of a multiline title.
+                    if top == last_title_top:
+                        draw.line((x, top + 113, min(x + width, WIDTH - MARGIN), top + 113),
+                                  fill='#c99a72', width=3)
+                else:
+                    if style == 'title' and title_style == 'soft':
+                        height, offset = 62, 28
+                    brush(max(0, x - 10), top + offset, min(width + 30, WIDTH - x - 20),
+                          height, top)
             for run, font in split_runs(line, fonts[style], fallbacks[style]):
                 draw.text((x,top), run, font=font, fill=color,
                           stroke_width=0,

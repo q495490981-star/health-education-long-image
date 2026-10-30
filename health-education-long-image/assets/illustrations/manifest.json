@@ -23,5 +23,105 @@
     "file": "rehab-walk.png",
     "description": "康复师陪同步行",
     "purpose": "通用场景插画，不作为解剖图或动作教学依据"
+  },
+  "shoulder-pain": {
+    "file": "shoulder-pain.png",
+    "description": "肩关节疼痛",
+    "purpose": "常见肩部疼痛示意"
+  },
+  "ankle-pain": {
+    "file": "ankle-pain.png",
+    "description": "足踝疼痛",
+    "purpose": "踝足疼痛示意"
+  },
+  "elbow-wrist-pain": {
+    "file": "elbow-wrist-pain.png",
+    "description": "肘腕部不适",
+    "purpose": "肘部与腕部疼痛示意"
+  },
+  "hip-pain": {
+    "file": "hip-pain.png",
+    "description": "髋部疼痛",
+    "purpose": "髋外侧疼痛示意"
+  },
+  "posture-imbalance": {
+    "file": "posture-imbalance.png",
+    "description": "姿态不对称",
+    "purpose": "站立姿态不对称示意；不能凭图片诊断脊柱侧弯"
+  },
+  "balance-training": {
+    "file": "balance-training.png",
+    "description": "平衡训练",
+    "purpose": "康复师保护下的单腿平衡训练"
+  },
+  "seated-stretch": {
+    "file": "seated-stretch.png",
+    "description": "坐位下肢拉伸",
+    "purpose": "坐位腿后侧拉伸示意"
+  },
+  "acupuncture": {
+    "file": "acupuncture.png",
+    "description": "针灸治疗",
+    "purpose": "针灸治疗概念场景；不作为取穴操作图"
+  },
+  "tuina": {
+    "file": "tuina.png",
+    "description": "推拿治疗",
+    "purpose": "中医推拿治疗概念场景；不作为操作手法示范"
+  },
+  "pediatric-rehab": {
+    "file": "pediatric-rehab.png",
+    "description": "儿童运动康复",
+    "purpose": "儿童平衡及运动康复场景"
+  },
+  "neck-pain": {
+    "file": "neck-pain.png",
+    "description": "颈部疼痛",
+    "purpose": "颈项部疼痛症状示意"
+  },
+  "lumbar-pain-man": {
+    "file": "lumbar-pain-man.png",
+    "description": "男性腰痛",
+    "purpose": "腰部疼痛男性场景"
+  },
+  "glute-bridge": {
+    "file": "glute-bridge.png",
+    "description": "臀桥训练",
+    "purpose": "仰卧屈膝臀桥训练姿态"
+  },
+  "walker-gait": {
+    "file": "walker-gait.png",
+    "description": "助行器步行训练",
+    "purpose": "治疗师协助老年人使用助行器步行"
+  },
+  "hand-therapy": {
+    "file": "hand-therapy.png",
+    "description": "手部康复训练",
+    "purpose": "治疗师指导手部握捏训练"
+  },
+  "wall-angel": {
+    "file": "wall-angel.png",
+    "description": "靠墙姿态练习",
+    "purpose": "靠墙肩臂姿态练习"
+  },
+  "diaphragmatic-breathing": {
+    "file": "diaphragmatic-breathing.png",
+    "description": "膈肌呼吸训练",
+    "purpose": "医患双人膈肌呼吸训练场景"
+  },
+  "moxibustion-knee": {
+    "file": "moxibustion-knee.png",
+    "description": "膝部艾灸",
+    "purpose": "膝部艾灸治疗概念场景；非操作距离示范"
+  },
+  "cupping": {
+    "file": "cupping.png",
+    "description": "拔罐治疗",
+    "purpose": "背部拔罐治疗概念场景"
+  },
+  "sit-to-stand": {
+    "file": "sit-to-stand.png",
+    "description": "坐站转移训练",
+    "purpose": "治疗师协助坐站转移训练"
   }
 }

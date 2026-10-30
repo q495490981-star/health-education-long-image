@@ -123,5 +123,55 @@
     "file": "sit-to-stand.png",
     "description": "坐站转移训练",
     "purpose": "治疗师协助坐站转移训练"
+  },
+  "elder-sit-to-stand-man": {
+    "file": "elder-sit-to-stand-man.png",
+    "description": "老年男性坐站转移训练",
+    "purpose": "治疗师协助老年人从椅子起身的场景示意"
+  },
+  "elder-balance-step-man": {
+    "file": "elder-balance-step-man.png",
+    "description": "老年男性平衡踏台训练",
+    "purpose": "治疗师保护下踏台平衡训练场景；不作为动作处方"
+  },
+  "elder-seated-leg-extension": {
+    "file": "elder-seated-leg-extension.png",
+    "description": "老年女性坐位伸膝训练",
+    "purpose": "治疗师指导下的坐位下肢伸膝训练场景"
+  },
+  "elder-neck-pain-man": {
+    "file": "elder-neck-pain-man.png",
+    "description": "老年男性颈部疼痛",
+    "purpose": "老年男性颈项部疼痛症状示意"
+  },
+  "elder-knee-pain-woman": {
+    "file": "elder-knee-pain-woman.png",
+    "description": "老年女性膝关节疼痛",
+    "purpose": "老年女性膝部疼痛症状示意"
+  },
+  "elder-tuina-woman": {
+    "file": "elder-tuina-woman.png",
+    "description": "老年女性推拿治疗",
+    "purpose": "老年患者接受肩背推拿治疗概念场景；不作为操作规范"
+  },
+  "elder-hand-strengthening": {
+    "file": "elder-hand-strengthening.png",
+    "description": "老年女性手部握力训练",
+    "purpose": "治疗师协助老年患者进行握捏训练"
+  },
+  "elder-shoulder-pain-man": {
+    "file": "elder-shoulder-pain-man.png",
+    "description": "老年男性肩关节疼痛",
+    "purpose": "老年男性肩部疼痛症状示意"
+  },
+  "elder-cane-walking-man": {
+    "file": "elder-cane-walking-man.png",
+    "description": "老年男性拄杖行走",
+    "purpose": "老年人使用手杖行走及治疗师陪护场景"
+  },
+  "elder-ankle-pain-woman": {
+    "file": "elder-ankle-pain-woman.png",
+    "description": "老年女性踝部疼痛",
+    "purpose": "老年女性踝足部疼痛症状示意"
   }
 }

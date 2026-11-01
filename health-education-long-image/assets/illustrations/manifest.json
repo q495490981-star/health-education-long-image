@@ -173,5 +173,105 @@
     "file": "elder-ankle-pain-woman.png",
     "description": "老年女性踝部疼痛",
     "purpose": "老年女性踝足部疼痛症状示意"
+  },
+  "autumn-dry-throat": {
+    "file": "autumn-dry-throat.png",
+    "description": "秋季咽喉干痒",
+    "purpose": "深秋干燥引起咽部干痒症状的场景插画"
+  },
+  "autumn-dry-cough": {
+    "file": "autumn-dry-cough.png",
+    "description": "秋季干咳",
+    "purpose": "干咳症状场景插画，不用于诊断病因"
+  },
+  "autumn-thirst": {
+    "file": "autumn-thirst.png",
+    "description": "秋燥口渴饮水",
+    "purpose": "秋冬口渴饮水场景插画"
+  },
+  "autumn-stomach-heat": {
+    "file": "autumn-stomach-heat.png",
+    "description": "胃部灼热感",
+    "purpose": "胃部不适症状场景插画，不作为病因诊断"
+  },
+  "autumn-dry-nose": {
+    "file": "autumn-dry-nose.png",
+    "description": "秋冬鼻腔干燥",
+    "purpose": "鼻部干燥不适的场景插画"
+  },
+  "autumn-dry-mouth": {
+    "file": "autumn-dry-mouth.png",
+    "description": "口舌干燥",
+    "purpose": "口舌干燥症状场景插画"
+  },
+  "autumn-lung-dryness": {
+    "file": "autumn-lung-dryness.png",
+    "description": "肺部干燥概念图",
+    "purpose": "中医润肺话题概念插画，不是解剖图"
+  },
+  "autumn-gastric-heat": {
+    "file": "autumn-gastric-heat.png",
+    "description": "胃部虚热概念图",
+    "purpose": "胃热概念性水彩插画，不是病理诊断图"
+  },
+  "autumn-ginkgo-leaves": {
+    "file": "autumn-ginkgo-leaves.png",
+    "description": "秋日银杏叶装饰",
+    "purpose": "秋冬科普长图使用的银杏叶水彩装饰"
+  },
+  "autumn-abdominal-bloating": {
+    "file": "autumn-abdominal-bloating.png",
+    "description": "腹胀消化不适",
+    "purpose": "腹胀消化不适概念插画"
+  },
+  "polygonatum-herb": {
+    "file": "polygonatum-herb.png",
+    "description": "玉竹中药饮片",
+    "purpose": "玉竹食材饮片水彩插画"
+  },
+  "polygonatum-pork-soup": {
+    "file": "polygonatum-pork-soup.png",
+    "description": "玉竹瘦肉汤",
+    "purpose": "家常玉竹瘦肉汤场景示意，不代表具体配方"
+  },
+  "polygonatum-herbal-tea": {
+    "file": "polygonatum-herbal-tea.png",
+    "description": "玉竹茶饮",
+    "purpose": "玉竹泡饮场景示意，不代表具体配方"
+  },
+  "lotus-root-fresh": {
+    "file": "lotus-root-fresh.png",
+    "description": "鲜莲藕",
+    "purpose": "新鲜莲藕食材插画"
+  },
+  "lotus-root-pork-soup": {
+    "file": "lotus-root-pork-soup.png",
+    "description": "莲藕排骨汤",
+    "purpose": "莲藕排骨汤家常饮食插画"
+  },
+  "lotus-root-stirfry": {
+    "file": "lotus-root-stirfry.png",
+    "description": "清炒莲藕",
+    "purpose": "清炒莲藕家常菜插画"
+  },
+  "lotus-root-porridge": {
+    "file": "lotus-root-porridge.png",
+    "description": "莲藕粥",
+    "purpose": "莲藕粥家常饮食插画"
+  },
+  "chinese-yam-fresh": {
+    "file": "chinese-yam-fresh.png",
+    "description": "鲜山药",
+    "purpose": "鲜山药食材插画"
+  },
+  "chinese-yam-steamed": {
+    "file": "chinese-yam-steamed.png",
+    "description": "清蒸山药",
+    "purpose": "清蒸山药饮食插画"
+  },
+  "chinese-yam-porridge": {
+    "file": "chinese-yam-porridge.png",
+    "description": "山药粥",
+    "purpose": "山药粥家常饮食插画"
   }
 }

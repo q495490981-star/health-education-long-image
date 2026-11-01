@@ -273,5 +273,105 @@
     "file": "chinese-yam-porridge.png",
     "description": "山药粥",
     "purpose": "山药粥家常饮食插画"
+  },
+  "neck-pain-male-profile": {
+    "file": "neck-pain-male-profile.png",
+    "description": "男性颈部疼痛",
+    "purpose": "颈后疼痛并扶颈的男性场景"
+  },
+  "cervical-disc-nerve-anatomy": {
+    "file": "cervical-disc-nerve-anatomy.png",
+    "description": "颈椎间盘与神经结构",
+    "purpose": "颈椎间盘与邻近神经关系概念示意，非精确解剖图"
+  },
+  "neck-trapezius-pain-female": {
+    "file": "neck-trapezius-pain-female.png",
+    "description": "女性颈肩斜方肌疼痛",
+    "purpose": "肩颈肌肉紧张疼痛症状插画"
+  },
+  "rotator-cuff-anatomy-new": {
+    "file": "rotator-cuff-anatomy-new.png",
+    "description": "肩袖与肩关节结构",
+    "purpose": "肩袖肌腱与肱骨头结构概念示意，非精确解剖图"
+  },
+  "forward-head-at-desk": {
+    "file": "forward-head-at-desk.png",
+    "description": "电脑前头颈前伸",
+    "purpose": "久坐电脑前头颈前伸姿势示意"
+  },
+  "low-back-pain-hands-on-waist": {
+    "file": "low-back-pain-hands-on-waist.png",
+    "description": "双手扶腰的腰背痛",
+    "purpose": "站立位双手扶腰的疼痛姿势"
+  },
+  "lumbar-disc-nerve-compression": {
+    "file": "lumbar-disc-nerve-compression.png",
+    "description": "腰椎间盘神经受压",
+    "purpose": "腰椎间盘与神经受压概念示意，非影像诊断图"
+  },
+  "sciatica-gluteal-leg-route": {
+    "file": "sciatica-gluteal-leg-route.png",
+    "description": "臀腿放射性疼痛",
+    "purpose": "臀部沿下肢的神经放射痛概念示意"
+  },
+  "knee-osteoarthritis-structure": {
+    "file": "knee-osteoarthritis-structure.png",
+    "description": "膝骨关节退变",
+    "purpose": "膝关节退变的结构概念示意，非精确解剖图"
+  },
+  "knee-pain-seated-man": {
+    "file": "knee-pain-seated-man.png",
+    "description": "坐位膝关节疼痛",
+    "purpose": "男性坐位扶膝的疼痛场景"
+  },
+  "neck-lateral-stretch-woman": {
+    "file": "neck-lateral-stretch-woman.png",
+    "description": "颈侧肌群拉伸",
+    "purpose": "女性坐位颈侧方伸展示意，非个人康复处方"
+  },
+  "chest-opening-shoulder-stretch": {
+    "file": "chest-opening-shoulder-stretch.png",
+    "description": "胸廓肩部打开伸展",
+    "purpose": "站立位胸廓和肩部扩展动作示意"
+  },
+  "cat-cow-two-postures": {
+    "file": "cat-cow-two-postures.png",
+    "description": "猫牛式脊柱活动",
+    "purpose": "四点跪位脊柱屈伸练习概念示意"
+  },
+  "glute-bridge-rehab-man": {
+    "file": "glute-bridge-rehab-man.png",
+    "description": "男性臀桥康复训练",
+    "purpose": "男性仰卧屈膝臀桥训练示意"
+  },
+  "hamstring-seated-stretch-man": {
+    "file": "hamstring-seated-stretch-man.png",
+    "description": "坐位大腿后侧拉伸",
+    "purpose": "男性坐位伸膝俯身拉伸示意"
+  },
+  "thoracic-foam-rolling": {
+    "file": "thoracic-foam-rolling.png",
+    "description": "胸椎泡沫轴放松",
+    "purpose": "仰卧位胸椎泡沫轴伸展放松示意"
+  },
+  "neck-acupuncture-closeup": {
+    "file": "neck-acupuncture-closeup.png",
+    "description": "颈肩针灸治疗特写",
+    "purpose": "颈肩针刺治疗概念场景，非操作和取穴教学"
+  },
+  "lumbar-massage-closeup": {
+    "file": "lumbar-massage-closeup.png",
+    "description": "腰背推拿治疗特写",
+    "purpose": "背部手法治疗概念场景，非手法教学"
+  },
+  "back-moxibustion-closeup": {
+    "file": "back-moxibustion-closeup.png",
+    "description": "腰背艾灸治疗特写",
+    "purpose": "腰背部艾灸治疗概念场景，非操作距离示范"
+  },
+  "back-cupping-closeup": {
+    "file": "back-cupping-closeup.png",
+    "description": "腰背拔罐治疗特写",
+    "purpose": "背部拔罐治疗概念场景，非操作规范"
   }
 }

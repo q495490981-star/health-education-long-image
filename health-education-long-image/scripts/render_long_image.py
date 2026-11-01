@@ -26,6 +26,31 @@ DARK = '#453326'
 ORANGE = '#bd5520'
 GREEN = '#e7edd3'
 
+# Palettes apply only to offline drawing. Illustrations retain their original
+# colours. The warm default deliberately preserves the existing output.
+PALETTES = {
+    'warm': {
+        'background': BG, 'text': DARK, 'heading': ORANGE,
+        'brush': None, 'brush_fallback': ('#f8e6ce', '#f9ead7'),
+        'underline': '#c99a72', 'warning': (163, 184, 116),
+        'image_wash': (218, 189, 134),
+    },
+    'calm-blue': {
+        'background': '#f5f8f7', 'text': '#253c47', 'heading': '#315e78',
+        'brush': ('#a5c4d2', '#f1f8fa'),
+        'brush_fallback': ('#d9eaf0', '#e4f1f4'),
+        'underline': '#7aa3b6', 'warning': (140, 180, 191),
+        'image_wash': (164, 198, 207),
+    },
+    'soft-sage': {
+        'background': '#f7f8ef', 'text': '#303f37', 'heading': '#4e705b',
+        'brush': ('#adccad', '#f4f9ef'),
+        'brush_fallback': ('#e0edda', '#eaf3e4'),
+        'underline': '#8caa88', 'warning': (161, 190, 148),
+        'image_wash': (181, 202, 169),
+    },
+}
+
 
 @lru_cache(maxsize=4)
 def bundled_font(name):
@@ -179,6 +204,12 @@ def main():
         data = json.load(f)
     if not isinstance(data, dict) or not isinstance(data.get('sections'), list):
         raise ValueError('Input must have a sections array')
+    palette_name = data.get('palette', 'warm')
+    if not isinstance(palette_name, str) or palette_name not in PALETTES:
+        raise ValueError(f"palette must be one of {', '.join(PALETTES)}")
+    palette = PALETTES[palette_name]
+    # Keep colours local to each render rather than mutating module globals.
+    BG, DARK, ORANGE = palette['background'], palette['text'], palette['heading']
     title_style = data.get('title_style', 'brush')
     if title_style not in ('brush', 'ink', 'soft'):
         raise ValueError("title_style must be 'brush', 'ink', or 'soft'")
@@ -378,6 +409,11 @@ def main():
     if brush_file.is_file():
         with Image.open(brush_file) as loaded:
             brush_art = loaded.convert('RGBA')
+        if palette['brush'] is not None:
+            from PIL import ImageOps
+            alpha = brush_art.getchannel('A')
+            brush_art = ImageOps.colorize(brush_art.convert('L'), *palette['brush']).convert('RGBA')
+            brush_art.putalpha(alpha)
         bbox = brush_art.getchannel('A').getbbox()
         if bbox:
             brush_art = brush_art.crop(bbox)
@@ -393,7 +429,7 @@ def main():
             yy = top + 13 + row * max(5, (height - 22) // 4)
             inset = rng.randint(0, 18)
             draw.line([(left + inset, yy), (right - rng.randint(0, 20), yy + rng.randint(-3, 3))],
-                      fill=('#f8e6ce' if row % 2 else '#f9ead7'), width=16)
+                      fill=palette['brush_fallback'][0 if row % 2 else 1], width=16)
 
     def wash(left, top, right, bottom, color, seed):
         # Broad irregular translucent pigment; no rectangular border.
@@ -420,7 +456,7 @@ def main():
     for op in ops:
         if op[0] == 'box':
             _, left, top, right, bottom = op
-            wash(left, top, right, bottom, (163, 184, 116), top)
+            wash(left, top, right, bottom, palette['warning'], top)
         elif op[0] == 'line':
             _, x, top, style, color, line = op
             if line and style in ('title', 'heading'):
@@ -433,7 +469,7 @@ def main():
                     # Draw once, beneath the final line of a multiline title.
                     if top == last_title_top:
                         draw.line((x, top + 113, min(x + width, WIDTH - MARGIN), top + 113),
-                                  fill='#c99a72', width=3)
+                                  fill=palette['underline'], width=3)
                 else:
                     if style == 'title' and title_style == 'soft':
                         height, offset = 62, 28
@@ -446,7 +482,7 @@ def main():
                 x += draw.textlength(run, font=font)
         else:
             _, x, top, img = op
-            wash(x-18, top+img.height-38, x+img.width+18, top+img.height+10, (218, 189, 134), top)
+            wash(x-18, top+img.height-38, x+img.width+18, top+img.height+10, palette['image_wash'], top)
             canvas.paste(img, (x,top), img)
     output=Path(args.output); output.parent.mkdir(parents=True,exist_ok=True)
     canvas.save(output,format='PNG')
